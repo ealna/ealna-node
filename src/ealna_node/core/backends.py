@@ -1,13 +1,13 @@
-"""Model backends, catalog economics, token counting, and guardrails.
+"""Model backends, catalog economics, and token counting.
 
-ponytail: the 'backends' are deterministic text transforms so the node runs with
-no GPU or model download, yet each model produces a genuinely different, testable
-output. Replace `run_chat` with a real backend (vLLM / llama.cpp / transformers)
+ponytail: the backends are deterministic text transforms so the node runs with no
+GPU or model download, yet each model produces a genuinely different, testable
+output. Replace `run_chat` with a real backend (vLLM / llama.cpp / transformers),
 keeping the MODELS economics and the same signature.
 """
 from __future__ import annotations
 
-import config
+FALLBACK = "open-llm-8b"
 
 # label -> {kind, energy (kWh/1k tok), price (EALNA/1k tok), tier}
 MODELS: dict[str, dict] = {
@@ -18,21 +18,18 @@ MODELS: dict[str, dict] = {
 }
 
 
+def economics(model: str) -> dict:
+    return MODELS.get(model, MODELS[FALLBACK])
+
+
 def tokens(text: str) -> int:
     """~4 chars/token heuristic. ponytail: swap for a real tokenizer for billing."""
     return max(1, len(text) // 4)
 
 
-def guardrail(text: str) -> tuple[bool, str | None]:
-    """Return (allowed, first blocked term). Blocklist is env-configurable."""
-    low = text.lower()
-    hit = next((w for w in config.BLOCKLIST if w in low), None)
-    return (hit is None, hit)
-
-
 def _reply(model: str, user: str) -> str:
     """Deterministic per-tier 'personality' so models differ observably."""
-    tier = MODELS.get(model, MODELS[config.DEFAULT_MODEL]).get("tier")
+    tier = economics(model).get("tier")
     if tier == "code":
         return f"```python\n# {model} via Ealna Veil\ndef solve():\n    return {user!r}\n```"
     if tier == "quality":
