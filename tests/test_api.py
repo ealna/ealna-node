@@ -56,6 +56,15 @@ def test_certificate_explorer(client):
     assert client.get("/certificates/GCC-nope").status_code == 404
 
 
+def test_certificate_stats(client):
+    for _ in range(2):
+        client.post("/v1/chat/completions", json={"messages": [{"role": "user", "content": "x"}]})
+    s = client.get("/certificates/stats").json()             # not shadowed by /{serial}
+    assert s["count"] == 2
+    assert s["energy_kwh"] > 0
+    assert sum(s["by_source"].values()) == 2
+
+
 def test_rate_limit_returns_429(settings):
     throttled = dataclasses.replace(settings, rate_qps=0, rate_burst=1)
     c = TestClient(create_app(throttled))

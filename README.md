@@ -83,13 +83,14 @@ tests/                  # pytest: one module per core unit + test_api.py
 | `POST` | `/v1/completions` · `/v1/embeddings` | legacy completion / embeddings |
 | `POST` | `/v1/vectors/upsert` · `/v1/vectors/query` | private RAG store + search |
 | `GET`  | `/v1/models` · `/route` | catalog / model router |
-| `GET`  | `/certificates[/{serial}]` · `POST /verify` | explorer / signature check |
+| `GET`  | `/certificates[/{serial}]` · `/certificates/stats` | explorer / ledger summary |
+| `POST` | `/verify` | recompute + check a certificate's signature |
 | `GET`  | `/metrics` · `/metrics/prom` | JSON / Prometheus metrics |
 
 ## Test
 
 ```bash
-pytest            # 27 tests: core units + API
+pytest            # 30 tests: core units + API
 ```
 
 ## What's stubbed (marked `ponytail:`)
