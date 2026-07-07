@@ -25,6 +25,33 @@ curl localhost:8000/v1/chat/completions -H 'content-type: application/json' \
   -d '{"messages":[{"role":"user","content":"hi"}]}'
 ```
 
+## The Green Compute Certificate
+
+Every call returns a signed certificate binding a **privacy** proof to a **carbon**
+proof — the artifact that makes "private and green" auditable instead of a claim:
+
+```json
+{
+  "job_id": "ea_9f3a1c7b",
+  "node_id": "node-7f3a",
+  "model": "open-llm-8b",
+  "privacy":    { "mode": "TEE", "attestation": "0x8f14e45f…", "data_exposed": false },
+  "carbon":     { "energy_source": "solar", "grid_gco2_per_kwh": 41.0,
+                  "energy_kwh": 0.0123, "est_gco2": 0.5043, "carbon_score": 91 },
+  "usage":      { "prompt_tokens": 12, "completion_tokens": 48, "total_tokens": 60 },
+  "hour": "2026-07-08T14:00Z",
+  "serial": "GCC-000128401",
+  "status": "verified",
+  "settlement": { "rail": "x402", "asset": "EALNA", "price_est": 0.00012 },
+  "signature": "0x5e884898…"
+}
+```
+
+`carbon_score` is `100 * (1 - gCO₂·kWh⁻¹ / 500)`, clamped to 0–100. `status` is
+`verified` when the carbon reading is live and `degraded` when the solar connector is
+unreachable (source `unknown`). Re-check any certificate's signature with `POST /verify`
+— a forged proof won't match the HMAC.
+
 ## Layout
 
 ```
