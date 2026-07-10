@@ -25,6 +25,25 @@ curl localhost:8000/v1/chat/completions -H 'content-type: application/json' \
   -d '{"messages":[{"role":"user","content":"hi"}]}'
 ```
 
+## Join the network
+
+Register your node in the dApp (Nodes tab) to get a **node key** (`ea_node_…`) —
+the credential the daemon authenticates with. The node dials **out** to the
+orchestrator, so no public IP or open ports are needed.
+
+```bash
+export EALNA_NODE_KEY=ea_node_...            # from the dApp
+export EALNA_ORCHESTRATOR_URL=https://...    # the network endpoint
+ealna-node
+```
+
+On start the node **announces** itself (id, models, TEE mode, clean-energy
+sources) and heartbeats to stay live — see `core/network.py`. New nodes go
+through a verification pipeline (model integrity, energy attestation) before they
+serve. `ponytail:` the job-dispatch pull loop is **Phase 1** — the orchestrator
+that pushes real user jobs isn't live yet, so `announce`/`heartbeat` are a safe
+no-op until `EALNA_ORCHESTRATOR_URL` is wired.
+
 ## The Green Compute Certificate
 
 Every call returns a signed certificate binding a **privacy** proof to a **carbon**

@@ -10,6 +10,8 @@ from dataclasses import dataclass
 class Settings:
     node_id: str
     node_url: str
+    node_key: str
+    orchestrator_url: str
     solar_url: str
     gateway_url: str
     default_model: str
@@ -28,6 +30,8 @@ def get_settings() -> Settings:
     return Settings(
         node_id=node_id,
         node_url=os.getenv("EALNA_NODE_URL", "http://localhost:8000"),
+        node_key=os.getenv("EALNA_NODE_KEY", ""),
+        orchestrator_url=os.getenv("EALNA_ORCHESTRATOR_URL", ""),
         solar_url=os.getenv("EALNA_SOLAR_URL", ""),
         gateway_url=os.getenv("EALNA_GATEWAY_URL", ""),
         default_model=os.getenv("EALNA_MODEL", "open-llm-8b"),
